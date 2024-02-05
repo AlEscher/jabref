@@ -1,6 +1,8 @@
 import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
+import com.teamscale.TestImpacted
+
 
 plugins {
     id 'application'
@@ -28,6 +30,8 @@ plugins {
     id 'idea'
 
     id 'org.openrewrite.rewrite' version '6.6.3'
+
+    id("com.teamscale") version "33.0.0"
 }
 
 // Enable following for debugging
@@ -727,4 +731,25 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
+}
+
+teamscale {
+    server {
+        url = 'http://localhost:8080/'
+        userName = 'admin'
+        userAccessToken = 'q4tu9vfAAjQZ1peCpPvQHSrLi5CeIcGY'
+        project = 'jabref'
+    }
+    report {
+        testwiseCoverage {
+            partition = 'Unit Tests'
+        }
+    }
+}
+
+tasks.register('tiaTests', TestImpacted) {
+    useJUnitPlatform()
+    jacoco {
+        includes = ["org.jabref.*"]
+    }
 }
